@@ -1,0 +1,4 @@
+[submodule "llama"]
+	path = llama
+	url = https://github.com/facebookresearch/llama.git
+	ignore = dirty
