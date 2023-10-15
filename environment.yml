@@ -1,0 +1,8 @@
+name: link_prediction
+channels:
+  - defaults
+dependencies:
+  - python>=3.8, <=3.11
+  - pip
+  - pip:
+    - -r requirements.txt
