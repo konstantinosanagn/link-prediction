@@ -42,19 +42,19 @@ def main(
     dialogs: List[Dialog] = [
         [
             {"role": "system", "content": 'The four types of propositions are "fact", "testimony", "policy", "value", and "reference". "Fact" is an objective proposition, meaning there are no subjective interpretations or judgements. "Testimony" is also an objective proposition that is experiential. "Policy" is a subjective proposition that insists on a specific course of action. "Value" is a subjective proposition that is a personal opinion or expression of feeling. "Reference" refers to a resource containing objective evidence. In product reviews, reference is usually a URL to another product page, image or video.'},
-            {"role": "user", "content": 'In one word, classify the following proposition as "fact", "testimony", "policy", "value", or "reference": "These damn things died within 3 months." Answer with one word.'}
+            {"role": "user", "content": 'Classify the following proposition as "fact", "testimony", "policy", "value", or "reference": "These damn things died within 3 months." Format your answer as "Classification: <answer>" with no other text.'}
         ],
         [
             {"role": "system", "content": 'The four types of propositions are "fact", "testimony", "policy", "value", and "reference". "Fact" is an objective proposition, meaning there are no subjective interpretations or judgements. "Testimony" is also an objective proposition that is experiential. "Policy" is a subjective proposition that insists on a specific course of action. "Value" is a subjective proposition that is a personal opinion or expression of feeling. "Reference" refers to a resource containing objective evidence. In product reviews, reference is usually a URL to another product page, image or video.'},
-            {"role": "user", "content": 'In one word, classify the following proposition as "fact", "testimony", "policy", "value", or "reference": "I wanted a headphone which does not press my hair." Answer with one word.'}
+            {"role": "user", "content": 'Classify the following proposition as "fact", "testimony", "policy", "value", or "reference": "I wanted a headphone which does not press my hair." Format your answer as "Classification: <answer>" with no other text.'}
         ],
         [
             {"role": "system", "content": 'The four types of propositions are "fact", "testimony", "policy", "value", and "reference". "Fact" is an objective proposition, meaning there are no subjective interpretations or judgements. "Testimony" is also an objective proposition that is experiential. "Policy" is a subjective proposition that insists on a specific course of action. "Value" is a subjective proposition that is a personal opinion or expression of feeling. "Reference" refers to a resource containing objective evidence. In product reviews, reference is usually a URL to another product page, image or video.'},
-            {"role": "user", "content": 'In one word, classify the following proposition as "fact", "testimony", "policy", "value", or "reference": "Please think carefully about buying this headset." Answer with one word.'}
+            {"role": "user", "content": 'Classify the following proposition as "fact", "testimony", "policy", "value", or "reference": "Please think carefully about buying this headset." Format your answer as "Classification: <answer>" with no other text.'}
         ],
         [
             {"role": "system", "content": 'The four types of propositions are "fact", "testimony", "policy", "value", and "reference". "Fact" is an objective proposition, meaning there are no subjective interpretations or judgements. "Testimony" is also an objective proposition that is experiential. "Policy" is a subjective proposition that insists on a specific course of action. "Value" is a subjective proposition that is a personal opinion or expression of feeling. "Reference" refers to a resource containing objective evidence. In product reviews, reference is usually a URL to another product page, image or video.'},
-            {"role": "user", "content": 'In one word, classify the following proposition as "fact", "testimony", "policy", "value", or "reference": "Good all around general headphones." Answer with one word.'}
+            {"role": "user", "content": 'Classify the following proposition as "fact", "testimony", "policy", "value", or "reference": "Good all around general headphones." Format your answer as "Classification: <answer>" with no other text.'}
         ],
     ]
     results = generator.chat_completion(
