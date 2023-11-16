@@ -10,6 +10,7 @@ import fire
 from llama import Llama, Dialog
 
 import src.amazon_review_parser as rp
+import from src.experiments.zero_shot_prompt_formatters import ZeroShotPromptFormatter
 
 def main(
     path_to_dataset: str,
@@ -62,31 +63,29 @@ def main(
     #
     # Possible TODO: Log to see the token input to the model.
     for i, (train_idxs, validation_idxs) in enumerate(kf.split(training_propositions)):
-        prompt_prefix = "Classify the following proposition as policy, fact, value, or testimony: "
-        user_prompts = [f"{prompt_prefix}{training_propositions[j].text}" for j in train_idxs]
         system_prompt = "The four types of propositions are policy, fact, value, and testimony. Fact is an objective proposition, meaning it does not leave any room for subjective interpretations or judgements. Testimony is also an objective proposition. However, it differs from fact in that it is experiential, i.e., it describes a personal state or experience. Policy is a subjective proposition that insists on a specific course of action. Value is a subjective proposition that is not policy. It is a personal opinion or expression of feeling. Reference is the only non-proposition elementary unit that refers to a resource containing objective evidence. In product reviews, reference is usually a URL to another product page, image or video."
+        prompt_prefix = 'Classify the following proposition as "fact", "testimony", "policy", "value", or "reference": '
+        prompt_suffix = ' Format your answer as "Classification: <answer>" with no other text.'
+        user_prompts = [f"{prompt_prefix}{training_propositions[j].text}{prompt_suffix}" for j in train_idxs]
 
-    # What is the independent variable? The format of the List of Dialogs (prompt format).
-    dialogs: List[Dialog] = []
-    # Try 1 System in first Dialog. Then try System in each Dialog. These can each be an experiment.
-    # Pass selected training/validation to experiment input formatter. Pass a max_seq_len so return val can be a list of lists if necessary.
-    # Run the model on the formatted prompts from the previous step's input.
+        # What is the independent variable? The format of the List of Dialogs (prompt format).
+        dialogs: List[Dialog] = ZeroShotPromptFormatter(system_prompt, user_prompts).get_dialogs()
+        # Try 1 System in first Dialog. Then try System in each Dialog. These can each be an experiment.
+        # Pass selected training/validation to experiment input formatter. Pass a max_seq_len so return val can be a list of lists if necessary.
+        # Run the model on the formatted prompts from the previous step's input.
 
-    results = generator.chat_completion(
-        dialogs,  # type: ignore
-        max_gen_len=max_gen_len,
-        temperature=temperature,
-        top_p=top_p,
-    )
-
-    # Save results
-    for dialog, result in zip(dialogs, results):
-        for msg in dialog:
-            print(f"{msg['role'].capitalize()}: {msg['content']}\n")
-        print(
-            f"> {result['generation']['role'].capitalize()}: {result['generation']['content']}"
+        results = generator.chat_completion(
+            dialogs,  # type: ignore
+            max_gen_len=max_gen_len,
+            temperature=temperature,
+            top_p=top_p,
         )
-        print("\n==================================\n")
+
+        # Save results
+        for dialog, result in zip(dialogs, results):
+
+        #TODO: Running one for now
+        break
 
 
 if __name__ == "__main__":
