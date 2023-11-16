@@ -23,7 +23,6 @@ class AmazonReview:
     """
     Amazon review data object.
     """
-    id: int
     propositions: List[Proposition]
     overall: float
     vote: str
@@ -49,31 +48,39 @@ def deserialize_amazon_reviews_jsonlist(filepath: str)\
     Returns:
         List[AmazonReview]: List of deserialized Amazon Reviews.
     """
-    def object_hook(obj):
+    def deserialize(obj):
         propositions_raw = obj['propositions']
         propositions = [Proposition(id=prop['id'],
-                                   type=prop['prop'],
+                                   type=prop['type'],
                                    text=prop['text'],
                                    reasons=prop['reasons'],
                                    evidence=prop['evidence'])
                         for prop in propositions_raw]
-        return AmazonReview(id=obj['id'],
-                            propositions=propositions,
+        return AmazonReview(propositions=propositions,
                             overall=obj['overall'],
-                            vote=obj['vote'],
+                            vote=obj.get('vote', '0'),
                             verified=obj['verified'],
                             review_time=obj['reviewTime'],
-                            review_id=obj['reviewId'],
+                            review_id=obj['reviewID'],
                             asin=obj['asin'],
-                            style=obj['style'],
+                            style=obj.get('style', None),
                             reviewer_name=obj['reviewerName'],
                             summary=obj['summary'],
                             unix_review_time=obj['unixReviewTime'],
                             existing=obj['existing'],
                             total=obj['total'])
-
     reviews = []
     with open(filepath, 'r', encoding='utf-8') as f:
         for line in f:
-            reviews.append(json.loads(line, object_hook=object_hook))
+            print(line)
+            reviews.append(deserialize(json.loads(line)))
     return reviews
+
+if __name__ == '__main__':
+    import sys
+    args = sys.argv[1:]
+    filepath = args[0]
+    reviews = deserialize_amazon_reviews_jsonlist(filepath)
+    for review in reviews:
+        print(review)
+    print(len(reviews))
