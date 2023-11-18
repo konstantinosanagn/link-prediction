@@ -28,4 +28,4 @@ class ZeroShotDialogFormatter():
                 prefix_with_sys_prompt = self.prefix_per_prompt
             dialog.append({"role": "user", "content": user_prompt})
             dialogs.append(dialog)
-        return dialog
+        return dialogs
