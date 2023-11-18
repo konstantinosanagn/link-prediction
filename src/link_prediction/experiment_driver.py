@@ -63,7 +63,7 @@ def run_experiments(
     )
 
     # Possible TODO: Log to see the token input to the model.
-    system_prompt = "The four types of propositions are policy, fact, value, and testimony. Fact is an objective proposition, meaning it does not leave any room for subjective interpretations or judgements. Testimony is also an objective proposition. However, it differs from fact in that it is experiential, i.e., it describes a personal state or experience. Policy is a subjective proposition that insists on a specific course of action. Value is a subjective proposition that is not policy. It is a personal opinion or expression of feeling. Reference is the only non-proposition elementary unit that refers to a resource containing objective evidence. In product reviews, reference is usually a URL to another product page, image or video."
+    system_prompt = 'The four types of propositions are "fact", "testimony", "policy", "value", and "reference". "Fact" is an objective proposition, meaning there are no subjective interpretations or judgements. "Testimony" is also an objective proposition that is experiential. "Policy" is a subjective proposition that insists on a specific course of action. "Value" is a subjective proposition that is a personal opinion or expression of feeling. "Reference" refers to a resource containing objective evidence. In product reviews, reference is usually a URL to another product page, image or video.'
     answer_token = "<answer>"
     answer_format = f"Classification: {answer_token}"
     user_prompt_format = 'Classify the following proposition as "fact", "testimony", "policy", "value", or "reference": {} ' +\
@@ -83,13 +83,14 @@ def run_experiments(
             top_p=top_p,
         )
 
-        answer_idx = answer_format.index(answer_token)
         results += [result['generation']['content'][answer_idx:].lower() for result in batch_results]
         if i == 0:
+            print(dialogs_batch)
             print(results)
+            break
 
     # Save results
-    df = pd.DataFrame(data={"Id": [t.id for t in training_set], "Actual": results, "Expected": expected_results})
-    df["AreEqual"] = np.where(df["Actual"] == df["Expected"], 1, 0)
-    accuracy = sum(df["AreEqual"]) / len(df["AreEqual"])
-    print(f"Accuracy: {accuracy}")
+    #df = pd.DataFrame(data={"Id": [t.id for t in training_set], "Actual": results, "Expected": expected_results})
+    #df["AreEqual"] = np.where(df["Actual"] == df["Expected"], 1, 0)
+    #accuracy = sum(df["AreEqual"]) / len(df["AreEqual"])
+    #print(f"Accuracy: {accuracy}")
