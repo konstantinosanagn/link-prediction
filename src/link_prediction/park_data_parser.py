@@ -72,7 +72,6 @@ def deserialize_amazon_reviews_jsonlist(filepath: str)\
     reviews = []
     with open(filepath, 'r', encoding='utf-8') as f:
         for line in f:
-            print(line)
             reviews.append(deserialize(json.loads(line)))
     return reviews
 

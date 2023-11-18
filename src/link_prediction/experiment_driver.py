@@ -6,16 +6,15 @@ Prepares dataset, runs experiments, and collects results.
 from typing import List, Optional
 from functools import reduce
 #from sklearn.model_selection import KFold
-import fire
 import pandas as pd
 import numpy as np
 
 from llama import Llama, Dialog
 
-import src.park_data_parser as rp
-from src.dialog_formatters import ZeroShotDialogFormatter
+import link_prediction.park_data_parser as rp
+from .dialog_formatters import ZeroShotDialogFormatter
 
-def main(
+def run_experiments(
     path_to_dataset: str,
     ckpt_dir: str,
     tokenizer_path: str,
@@ -46,7 +45,10 @@ def main(
 
     # load dataset once (<1 mb)
     training_reviews = rp.deserialize_amazon_reviews_jsonlist(path_to_dataset)
-    training_propositions = list(reduce(lambda x, y: x.propositions + y.propositions, training_reviews, []))
+    training_propositions = []
+    for review in training_reviews:
+        for prop in review.propositions:
+            training_propositions.append(prop)
 
     # TODO: 1/7 holdout for examples, 3/7 for training, 3/7 validation
     training_set = training_propositions
@@ -82,6 +84,3 @@ def main(
     df["AreEqual"] = np.where(df["Actual"] == df["Expected"], 1, 0)
     accuracy = sum(df["AreEqual"]) / len(df["AreEqual"])
     print(f"Accuracy: {accuracy}")
-
-if __name__ == "__main__":
-    fire.Fire(main)
