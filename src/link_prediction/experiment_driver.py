@@ -72,17 +72,21 @@ def run_experiments(
     expected_results = [training_sample.type for training_sample in training_set]
     # TODO: Change this to just be a function
     dialogs: List[Dialog] = ZeroShotDialogFormatter(system_prompt, user_prompts, True).get_dialogs()
+    results = []
+    for i in range(0, len(dialogs), max_batch_size):
+        dialogs_batch = dialogs[i:i+max_batch_size] if i+max_batch_size < len(dialogs) else dialogs[i:]
+        # TODO: May need to clean the output if result is not in expected format
+        batch_results = generator.chat_completion(
+            dialogs_batch,  # type: ignore
+            max_gen_len=max_gen_len,
+            temperature=temperature,
+            top_p=top_p,
+        )
 
-    # TODO: May need to clean the output if result is not in expected format
-    results = generator.chat_completion(
-        dialogs,  # type: ignore
-        max_gen_len=max_gen_len,
-        temperature=temperature,
-        top_p=top_p,
-    )
-
-    answer_idx = answer_format.index(answer_token)
-    results = [result['generation']['content'][answer_idx:].lower() for result in results]
+        answer_idx = answer_format.index(answer_token)
+        results += [result['generation']['content'][answer_idx:].lower() for result in batch_results]
+        if i == 0:
+            print(results)
 
     # Save results
     df = pd.DataFrame(data={"Id": [t.id for t in training_set], "Actual": results, "Expected": expected_results})
