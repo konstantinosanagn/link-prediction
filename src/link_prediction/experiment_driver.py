@@ -71,7 +71,8 @@ def run_experiments(
     user_prompts = [user_prompt_format.format(training_sample.text) for training_sample in training_set]
     expected_results = [training_sample.type for training_sample in training_set]
     # TODO: Change this to just be a function
-    dialogs: List[Dialog] = ZeroShotDialogFormatter(system_prompt, user_prompts).get_dialogs()
+    dialogs: List[Dialog] = ZeroShotDialogFormatter(system_prompt, user_prompts, True).get_dialogs()
+    print(dialogs[0])
 
     # TODO: May need to clean the output if result is not in expected format
     results = generator.chat_completion(
