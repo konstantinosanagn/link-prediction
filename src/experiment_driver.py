@@ -4,13 +4,16 @@ Prepares dataset, runs experiments, and collects results.
 """
 
 from typing import List, Optional
-from sklearn.model_selection import KFold
+from functools import reduce
+#from sklearn.model_selection import KFold
 import fire
+import pandas as pd
+import numpy as np
 
 from llama import Llama, Dialog
 
-import src.amazon_review_parser as rp
-import from src.experiments.zero_shot_prompt_formatters import ZeroShotPromptFormatter
+import src.park_data_parser as rp
+from src.dialog_formatters import ZeroShotDialogFormatter
 
 def main(
     path_to_dataset: str,
@@ -38,12 +41,17 @@ def main(
         max_gen_len (int, optional): The maximum length of generated sequences. If None, it will be
             set to the model's max sequence length. Defaults to None.
     """
+    run_on_validation = False
+    run_on_test = False
 
     # load dataset once (<1 mb)
     training_reviews = rp.deserialize_amazon_reviews_jsonlist(path_to_dataset)
-    training_propositions = []
-    for review in training_reviews:
-        training_propositions += review.propositions
+    training_propositions = list(reduce(lambda x, y: x.propositions + y.propositions, training_reviews, []))
+
+    # TODO: 1/7 holdout for examples, 3/7 for training, 3/7 validation
+    training_set = training_propositions
+    validation_set = []
+    test_set = []
 
     generator = Llama.build(
         ckpt_dir=ckpt_dir,
@@ -52,41 +60,28 @@ def main(
         max_batch_size=max_batch_size,
     )
 
-    # Optionally do k-fold cross validation w/some split defined by param.
-    k = 5
-    seed = 1
-    # Split w/sklearn, do k-fold CV myself.
-    kf = KFold(n_splits=k, random_state=seed, shuffle=True)
-    # For each fold, sample from training_reviews' _propositions_ to get a single training and validation split.
-    # Then, format Dialogs list so System role has definition, no assistant (zero-shot).
-    # The actual prompt will be an instruction to the model to classify the proposition (requires some formatting).
-    #
     # Possible TODO: Log to see the token input to the model.
-    for i, (train_idxs, validation_idxs) in enumerate(kf.split(training_propositions)):
-        system_prompt = "The four types of propositions are policy, fact, value, and testimony. Fact is an objective proposition, meaning it does not leave any room for subjective interpretations or judgements. Testimony is also an objective proposition. However, it differs from fact in that it is experiential, i.e., it describes a personal state or experience. Policy is a subjective proposition that insists on a specific course of action. Value is a subjective proposition that is not policy. It is a personal opinion or expression of feeling. Reference is the only non-proposition elementary unit that refers to a resource containing objective evidence. In product reviews, reference is usually a URL to another product page, image or video."
-        prompt_prefix = 'Classify the following proposition as "fact", "testimony", "policy", "value", or "reference": '
-        prompt_suffix = ' Format your answer as "Classification: <answer>" with no other text.'
-        user_prompts = [f"{prompt_prefix}{training_propositions[j].text}{prompt_suffix}" for j in train_idxs]
+    system_prompt = "The four types of propositions are policy, fact, value, and testimony. Fact is an objective proposition, meaning it does not leave any room for subjective interpretations or judgements. Testimony is also an objective proposition. However, it differs from fact in that it is experiential, i.e., it describes a personal state or experience. Policy is a subjective proposition that insists on a specific course of action. Value is a subjective proposition that is not policy. It is a personal opinion or expression of feeling. Reference is the only non-proposition elementary unit that refers to a resource containing objective evidence. In product reviews, reference is usually a URL to another product page, image or video."
+    user_prompt_format = 'Classify the following proposition as "fact", "testimony", "policy", "value", or "reference": {0} ' +\
+        'Format your answer as "<answer>" in all lowercase and no other text.'
+    user_prompts = [user_prompt_format.format(training_sample.text) for training_sample in training_set]
+    expected_results = [training_sample.type for training_sample in training_set]
+    # TODO: Change this to just be a function
+    dialogs: List[Dialog] = ZeroShotDialogFormatter(system_prompt, user_prompts).get_dialogs()
 
-        # What is the independent variable? The format of the List of Dialogs (prompt format).
-        dialogs: List[Dialog] = ZeroShotPromptFormatter(system_prompt, user_prompts).get_dialogs()
-        # Try 1 System in first Dialog. Then try System in each Dialog. These can each be an experiment.
-        # Pass selected training/validation to experiment input formatter. Pass a max_seq_len so return val can be a list of lists if necessary.
-        # Run the model on the formatted prompts from the previous step's input.
+    # TODO: May need to clean the output if result is not in expected format
+    results = generator.chat_completion(
+        dialogs,  # type: ignore
+        max_gen_len=max_gen_len,
+        temperature=temperature,
+        top_p=top_p,
+    )
 
-        results = generator.chat_completion(
-            dialogs,  # type: ignore
-            max_gen_len=max_gen_len,
-            temperature=temperature,
-            top_p=top_p,
-        )
-
-        # Save results
-        for dialog, result in zip(dialogs, results):
-
-        #TODO: Running one for now
-        break
-
+    # Save results
+    df = pd.DataFrame(data={"Id": [t.id for t in training_set], "Actual": results, "Expected": expected_results})
+    df["AreEqual"] = np.where(df["Actual"] == df["Expected"], 1, 0)
+    accuracy = sum(df["AreEqual"]) / len(df["AreEqual"])
+    print(f"Accuracy: {accuracy}")
 
 if __name__ == "__main__":
     fire.Fire(main)
