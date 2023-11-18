@@ -14,6 +14,13 @@ from llama import Llama, Dialog
 import link_prediction.park_data_parser as rp
 from .dialog_formatters import ZeroShotDialogFormatter
 
+def get_parsed_assistant_response(response: str) -> str:
+    valid_options = ["fact", "testimony", "policy", "value", "reference"]
+    search_token = "Classification:"
+    idx = response.index(search_token)
+    possible_ans = response[idx+len(search_token):].strip().replace('"', '').lower()
+    return possible_ans if possible_ans in valid_options else ""
+
 def run_experiments(
     path_to_dataset: str,
     ckpt_dir: str,
@@ -66,8 +73,8 @@ def run_experiments(
     system_prompt = 'The four types of propositions are "fact", "testimony", "policy", "value", and "reference". "Fact" is an objective proposition, meaning there are no subjective interpretations or judgements. "Testimony" is also an objective proposition that is experiential. "Policy" is a subjective proposition that insists on a specific course of action. "Value" is a subjective proposition that is a personal opinion or expression of feeling. "Reference" refers to a resource containing objective evidence. In product reviews, reference is usually a URL to another product page, image or video.'
     answer_token = "<answer>"
     answer_format = f"Classification: {answer_token}"
-    user_prompt_format = 'Classify the following proposition as "fact", "testimony", "policy", "value", or "reference": {} ' +\
-        f'Format your answer as "{answer_format}" with no other text.'
+    user_prompt_format = 'Classify the following proposition as "fact", "testimony", "policy", "value", or "reference": "{}"\n' +\
+        f'With no other text, answer in the desired format:\n{answer_format}'
     user_prompts = [user_prompt_format.format(training_sample.text) for training_sample in training_set]
     expected_results = [training_sample.type for training_sample in training_set]
     # TODO: Change this to just be a function
@@ -82,15 +89,12 @@ def run_experiments(
             temperature=temperature,
             top_p=top_p,
         )
-
-        results += [result['generation']['content'][answer_idx:].lower() for result in batch_results]
-        if i == 0:
-            print(dialogs_batch)
-            print(results)
-            break
+        #print([result['generation']['content'] for result in batch_results])
+        results += [get_parsed_assistant_response(result['generation']['content']) for result in batch_results]
+    #print(results)
 
     # Save results
-    #df = pd.DataFrame(data={"Id": [t.id for t in training_set], "Actual": results, "Expected": expected_results})
-    #df["AreEqual"] = np.where(df["Actual"] == df["Expected"], 1, 0)
-    #accuracy = sum(df["AreEqual"]) / len(df["AreEqual"])
-    #print(f"Accuracy: {accuracy}")
+    df = pd.DataFrame(data={"Id": [t.id for t in training_set], "Actual": results, "Expected": expected_results})
+    df["AreEqual"] = np.where(df["Actual"] == df["Expected"], 1, 0)
+    accuracy = sum(df["AreEqual"]) / len(df["AreEqual"])
+    print(f"Accuracy: {accuracy}")
