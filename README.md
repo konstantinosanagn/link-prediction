@@ -25,7 +25,7 @@
 - This will install all dependencies required by this project via `pip` (including the llama repo as an editable package).
 
 # Run
-`torchrun --nproc_per_node 2 type_clas.py --path_to_cfg ./experiment_config.json --ckpt_dir /home/parklab/models/llama2/llama-2-13b-chat/ --tokenizer_path /home/parklab/models/llama2/tokenizer.model`
+`torchrun --nproc_per_node 2 main.py --path_to_cfg ./experiment_config.json --ckpt_dir /home/parklab/models/llama2/llama-2-13b-chat/ --tokenizer_path /home/parklab/models/llama2/tokenizer.model`
 
 # Miscellaneous
 ## llama submodule
