@@ -27,10 +27,10 @@ def run_experiment(
     data: SplitData,
     system_prompt: str,
     user_prompt_format: str,
-    temperature: float = 0.6,
-    top_p: float = 0.9,
-    max_batch_size: int = 8,
-    max_gen_len: Optional[int] = None,
+    temperature: float,
+    top_p: float,
+    max_batch_size: int,
+    max_gen_len: Optional[int],
     run_on_validation = False,
     run_on_test = False
 ):
