@@ -6,8 +6,8 @@ from typing import Optional
 import fire
 from llama.generation import Llama
 
-from link_prediction.experiment_driver import run_experiment
-from dataset_loaders import *
+from lib.link_prediction.experiment_driver import run_experiment
+from lib.dataset_loaders import *
 
 def main(
     path_to_cfg: str,
