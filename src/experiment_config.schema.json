@@ -1,0 +1,50 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.com/experiment_config.schema.json",
+  "title": "Experiment Config",
+  "description": "Configuration for an experiment",
+  "type": "object",
+  "properties": {
+    "seed": {
+      "type": "integer"
+    },
+    "dataset_dir_path": {
+      "type": "string"
+    },
+    "dataset_loader": {
+      "type": "string"
+    },
+    "use_propositions": {
+      "type": "boolean"
+    },
+    "train": {
+      "type": "number"
+    },
+    "validation": {
+      "type": "number"
+    },
+    "test": {
+      "type": "number"
+    },
+    "experiments": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "num_examples": {
+            "type": "integer"
+          },
+          "system_prompt": {
+            "type": "string"
+          },
+          "user_prompt_format": {
+            "type": "string"
+          }
+        }
+      }
+    }
+  }
+}
