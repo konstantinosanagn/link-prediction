@@ -50,9 +50,11 @@ class PropositionResponseParser(BaseResponseParser):
         """
         See parent.
         """
+        print(f"Parsing assistant response: {response}")
         search_res: re.Match = self.answer_format_regex.search(response)
         if not search_res:
             raise ValueError(f'response did not match the answer format: {response}')
         # Llama's answer will be somewhere after the search_token
         possible_ans = search_res.group(0).strip().replace('"', '').lower()
+        # BUG: Should throw?
         return possible_ans if possible_ans in self.proposition_types else ""
