@@ -44,6 +44,7 @@ class DatasetLoader:
         self._test = test
 
         random.seed(seed)
+        self._seed = seed
         self._loaded_train_data, self.test_data = self.load_data_from_dir(dataset_path,
                                                                           use_propositions)
         # shuffle train data
@@ -119,7 +120,7 @@ class DatasetLoader:
             data = self._deserialize_helper(jsonlists[0], use_propositions)
             train_data, test_data = train_test_split(data,
                                                      self._test, self._train + self._validation,
-                                                     self.seed)
+                                                     self._seed)
         else:
             # first file containing 'train' is training list
             # first file containing 'test' is test list
