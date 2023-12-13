@@ -41,7 +41,7 @@ class PropositionResponseParser(BaseResponseParser):
         """
         super().__init__(answer_token, answer_format)
         # This info is repeated in multiple places
-        self.proposition_types = set('fact', 'testimony', 'policy', 'value', 'reference')
+        self.proposition_types = set(['fact', 'testimony', 'policy', 'value', 'reference'])
         # Convert answer_format to regex
         self.answer_format_regex: re.Pattern = re.compile(answer_format.replace('{}', '(.*)'),
                                                           re.IGNORECASE)
