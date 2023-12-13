@@ -119,8 +119,9 @@ class DatasetLoader:
             # split single file into train/test
             data = self._deserialize_helper(jsonlists[0], use_propositions)
             train_data, test_data = train_test_split(data,
-                                                     self._test, self._train + self._validation,
-                                                     self._seed)
+                                                     test_size=self._test,
+                                                     train_size=self._train + self._validation,
+                                                     random_state=self._seed)
         else:
             # first file containing 'train' is training list
             # first file containing 'test' is test list
