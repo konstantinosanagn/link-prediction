@@ -46,6 +46,7 @@ def run_experiment(
         run_on_test (bool): Whether to also generate responses for prompts from the test set.
             Defaults to False.
     """
+    print(f"System prompt: {system_prompt}")
     # TODO: Validate args?
     splits_to_use = [data['train']]
     if run_on_validation and data['validation']:
@@ -57,6 +58,7 @@ def run_experiment(
         user_prompts = [user_prompt_format.format(sample.text,
                                                   response_parser.answer_format.format(response_parser.answer_token))
                         for sample in split]
+        print(f"User prompts: {user_prompts}")
         examples = [Example(
             user_prompt=user_prompt_format.format(example.text, response_parser.answer_format.format(response_parser.answer_token)),
             assistant_response=response_parser.answer_format.format(example.type))
