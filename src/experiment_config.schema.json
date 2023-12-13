@@ -14,6 +14,9 @@
     "dataset_loader": {
       "type": "string"
     },
+    "response_parser": {
+      "type": "string"
+    },
     "use_propositions": {
       "type": "boolean"
     },

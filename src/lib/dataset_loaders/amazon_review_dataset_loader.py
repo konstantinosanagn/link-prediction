@@ -1,5 +1,6 @@
 """
-
+Module containing functionality for loading comments and propositions
+and splitting into train/validation/test.
 """
 import random
 import os
@@ -7,16 +8,22 @@ import re
 from typing import Any, List, TypedDict, Optional, Tuple, Union
 from sklearn.model_selection import train_test_split
 
-from .park_data_parser import (Proposition, AmazonReview,
-                               deserialize_amazon_reviews_jsonlist)
+from .park_data_parser import (Proposition, Comment,
+                               deserialize_comments_jsonlist)
 
 class SplitData(TypedDict):
+    """
+    Dict to store split data.
+    """
     train: List[Any]
     validation: List[Any]
     test: List[Any]
     examples: List[Any]
 
-class AmazonReviewDatasetLoader:
+class DatasetLoader:
+    """
+    Class to deserialize and split data.
+    """
     def __init__(
         self,
         dataset_path: str,
@@ -26,6 +33,12 @@ class AmazonReviewDatasetLoader:
         validation: Optional[float] = None,
         test: Optional[float] = None
     ) -> None:
+        """
+        Args:
+
+        Returns:
+
+        """
         self._train = train
         self._validation = validation
         self._test = test
@@ -45,6 +58,12 @@ class AmazonReviewDatasetLoader:
         self,
         num_examples: int
     ) -> SplitData:
+        """
+        Args:
+
+        Returns:
+
+        """
         if num_examples > 0.5 * len(self._loaded_train_data):
             raise ValueError("num_examples cannot be more than half the training set.")
         examples = self._loaded_train_data[:num_examples]
@@ -62,8 +81,13 @@ class AmazonReviewDatasetLoader:
         self,
         dataset_path: str,
         use_propositions: bool
-    ) -> List[Union[Proposition, AmazonReview]]:
-        orig_dataset = deserialize_amazon_reviews_jsonlist(dataset_path)
+    ) -> List[Union[Proposition, Comment]]:
+        """
+        Args:
+
+        Returns:
+        """
+        orig_dataset = deserialize_comments_jsonlist(dataset_path)
         return orig_dataset if not use_propositions \
                 else [prop for review in orig_dataset for prop in review.propositions]
 
@@ -71,7 +95,13 @@ class AmazonReviewDatasetLoader:
         self,
         dataset_dir_path: str,
         use_propositions: bool
-    ) -> Tuple[List[Union[Proposition, AmazonReview]], List[Union[Proposition, AmazonReview]]]:
+    ) -> Tuple[List[Union[Proposition, Comment]], List[Union[Proposition, Comment]]]:
+        """
+
+        Args:
+
+        Returns:
+        """
         # search for all jsonlists in dataset_dir_path
         jsonlists = []
         for filename in os.listdir(dataset_dir_path):
@@ -94,9 +124,11 @@ class AmazonReviewDatasetLoader:
             # first file containing 'train' is training list
             # first file containing 'test' is test list
             for filepath in jsonlists:
-                if not train_data and re.search('train', os.path.basename(filepath), re.IGNORECASE) is not None:
+                if not train_data and \
+                        re.search('train', os.path.basename(filepath), re.IGNORECASE) is not None:
                     train_data = self._deserialize_helper(filepath, use_propositions)
-                if not test_data and re.search('test', os.path.basename(filepath), re.IGNORECASE) is not None:
+                if not test_data and \
+                        re.search('test', os.path.basename(filepath), re.IGNORECASE) is not None:
                     test_data = self._deserialize_helper(filepath, use_propositions)
                 if train_data and test_data:
                     break

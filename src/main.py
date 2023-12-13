@@ -8,6 +8,7 @@ from llama.generation import Llama
 
 from lib.link_prediction.experiment_driver import run_experiment
 from lib.dataset_loaders import *
+from lib.link_prediction.assistant_response_parsers import *
 
 def main(
     path_to_cfg: str,
@@ -34,6 +35,7 @@ def main(
             cfg['validation'],
             cfg['test']
         )
+    response_parser: BaseResponseParser = globals()[cfg['response_parser']]()
     generator = Llama.build(
             ckpt_dir=ckpt_dir,
             tokenizer_path=tokenizer_path,
@@ -45,6 +47,7 @@ def main(
         try:
             run_experiment(
                     generator,
+                    response_parser,
                     data,
                     experiment_cfg['system_prompt'],
                     experiment_cfg['user_prompt_format'],
