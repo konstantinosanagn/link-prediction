@@ -49,8 +49,8 @@ class AmazonReviewDatasetLoader:
             raise ValueError("num_examples cannot be more than half the training set.")
         examples = self._loaded_train_data[:num_examples]
         train_data, validation_data = train_test_split(self._loaded_train_data[num_examples:],
-                                                       self._validation,
-                                                       self._train)
+                                                       test_size=self._validation,
+                                                       train_size=self._train)
         return {
                 "examples": examples,
                 "train": train_data,
@@ -65,7 +65,7 @@ class AmazonReviewDatasetLoader:
     ) -> List[Union[Proposition, AmazonReview]]:
         orig_dataset = deserialize_amazon_reviews_jsonlist(dataset_path)
         return orig_dataset if not use_propositions \
-                else [prop for props in orig_dataset for prop in props]
+                else [prop for review in orig_dataset for prop in review.propositions]
 
     def load_data_from_dir(
         self,
@@ -94,9 +94,9 @@ class AmazonReviewDatasetLoader:
             # first file containing 'train' is training list
             # first file containing 'test' is test list
             for filepath in jsonlists:
-                if not train_data and re.search('train', os.path.basename(filepath), re.IGNORECASE):
+                if not train_data and re.search('train', os.path.basename(filepath), re.IGNORECASE) is not None:
                     train_data = self._deserialize_helper(filepath, use_propositions)
-                if not test_data and re.search('test', os.path.basename(filepath), re.IGNORECASE):
+                if not test_data and re.search('test', os.path.basename(filepath), re.IGNORECASE) is not None:
                     test_data = self._deserialize_helper(filepath, use_propositions)
                 if train_data and test_data:
                     break

@@ -2,6 +2,7 @@
   "seed": 1,
   "dataset_dir_path": "/home/parklab/data/am2_emnlp2022",
   "dataset_loader": "AmazonReviewDatasetLoader",
+  "response_parser": "PropositionResponseParser",
   "use_propositions": true,
   "train": 0.7,
   "validation": 0.2,
