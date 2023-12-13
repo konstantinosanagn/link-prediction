@@ -67,7 +67,6 @@ def run_experiment(
         # Have to submit prompts in batches
         for i in range(0, len(dialogs), max_batch_size):
             dialogs_batch = dialogs[i:i+max_batch_size] if i+max_batch_size < len(dialogs) else dialogs[i:]
-            print(f"Dialogs: {dialogs_batch}")
             batch_results = generator.chat_completion(
                 dialogs_batch,  # type: ignore
                 max_gen_len=max_gen_len,

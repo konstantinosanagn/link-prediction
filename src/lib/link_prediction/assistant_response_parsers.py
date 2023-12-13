@@ -43,7 +43,7 @@ class PropositionResponseParser(BaseResponseParser):
         # This info is repeated in multiple places
         self.proposition_types = set(['fact', 'testimony', 'policy', 'value', 'reference'])
         # Convert answer_format to regex
-        self.answer_format_regex: re.Pattern = re.compile(answer_format.replace('{}', '(.*)'),
+        self.answer_format_regex: re.Pattern = re.compile(answer_format.replace('{}', '(\w+)'),
                                                           re.IGNORECASE)
 
     def get_parsed_response(self, response: str) -> str:
@@ -56,5 +56,6 @@ class PropositionResponseParser(BaseResponseParser):
             raise ValueError(f'response did not match the answer format: {response}')
         # Llama's answer will be somewhere after the search_token
         possible_ans = search_res.group(0).strip().replace('"', '').lower()
+        print(f"Possible parsed response: {possible_ans}")
         # BUG: Should throw?
         return possible_ans if possible_ans in self.proposition_types else ""
