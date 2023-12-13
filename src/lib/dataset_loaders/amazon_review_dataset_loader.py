@@ -116,7 +116,7 @@ class DatasetLoader:
         test_data = None
         if len(jsonlists) == 1:
             # split single file into train/test
-            data = self.deserialize_helper(jsonlists[0], use_propositions)
+            data = self._deserialize_helper(jsonlists[0], use_propositions)
             train_data, test_data = train_test_split(data,
                                                      self._test, self._train + self._validation,
                                                      self.seed)
