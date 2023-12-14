@@ -3,6 +3,7 @@ Module containing parsing clases for a Llama-generated response.
 """
 
 from abc import ABC, abstractmethod
+from typing import List
 import re
 
 class BaseResponseParser(ABC):
@@ -40,22 +41,34 @@ class PropositionResponseParser(BaseResponseParser):
         See parent.
         """
         super().__init__(answer_token, answer_format)
-        # This info is repeated in multiple places
-        self.proposition_types = set(['fact', 'testimony', 'policy', 'value', 'reference'])
-        # Convert answer_format to regex
-        self.answer_format_regex: re.Pattern = re.compile(answer_format.replace('{}', '(\w+)'),
-                                                          re.IGNORECASE)
+
+    def _get_answer_using_regex_match(self, pattern: str, response: str) -> str:
+        match: re.Match = re.search(pattern, response, re.IGNORECASE)
+        result = match.group(1) if match else ""
+        return result
 
     def get_parsed_response(self, response: str) -> str:
         """
         See parent.
         """
+        # BUG: This info is repeated in multiple places
+        proposition_types = set(['fact', 'testimony', 'policy', 'value', 'reference'])
+        patterns = [
+                # Search for answer in quotes
+                r'.*?"(\w+)"',
+                # Search for answer in answer_format
+                '.*?{}'.format(self.answer_format.replace('{}', r'(\w+)')),
+                '.*?{}'.format(self.answer_format.replace('{}', r'"(\w+)"'))
+                ]
         print(f"Parsing assistant response: {response}")
-        search_res: re.Match = self.answer_format_regex.search(response)
-        if not search_res:
-            raise ValueError(f'response did not match the answer format: {response}')
+        for pattern in patterns:
+            search_res = self._get_answer_using_regex_match(pattern, response)
+            if search_res:
+                break
+        else:
+            raise ValueError(f'response did not match any search formats: {response}')
         # Llama's answer will be somewhere after the search_token
-        possible_ans = search_res.group(0).strip().replace('"', '').lower()
+        possible_ans = search_res.strip().replace('"', '').lower()
         print(f"Possible parsed response: {possible_ans}")
         # BUG: Should throw?
-        return possible_ans if possible_ans in self.proposition_types else ""
+        return possible_ans if possible_ans in proposition_types else ""
