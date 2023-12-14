@@ -8,7 +8,7 @@ import numpy as np
 
 from llama import Llama, Dialog
 
-from lib.dataset_loaders import SplitData
+from src.lib.dataset_loaders import SplitData
 from .dialog_formatters import get_dialogs, Example
 from .assistant_response_parsers import BaseResponseParser
 
