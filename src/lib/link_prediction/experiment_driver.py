@@ -57,11 +57,14 @@ def run_experiment(
         user_prompts = [user_prompt_format.format(sample.text,
                                                   response_parser.answer_format.format(response_parser.answer_token))
                         for sample in split]
+        print("Input prompts:" + user_prompts)
         examples = [Example(
             user_prompt=user_prompt_format.format(example.text, response_parser.answer_format.format(response_parser.answer_token)),
             assistant_response=response_parser.answer_format.format(example.type))
                     for example in data['examples']]
+        print("Examples:" + examples)
         expected_results = [sample.type for sample in split]
+        print("Expected results:" + expected_results)
         dialogs: List[Dialog] = get_dialogs(system_prompt, user_prompts, examples, True)
         results = []
         # Have to submit prompts in batches
@@ -74,6 +77,7 @@ def run_experiment(
                 top_p=top_p
             )
             results += [response_parser.get_parsed_response(result['generation']['content']) for result in batch_results]
+        print("Results:" + results)
 
         # Save results
         # TODO: Record the success rate of each proposition type
