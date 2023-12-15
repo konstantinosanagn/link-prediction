@@ -66,7 +66,7 @@ class PropositionResponseParser(BaseResponseParser):
             if search_res:
                 break
         else:
-            raise ValueError(f'response did not match any search formats: {response}')
+            return ""
         # Llama's answer will be somewhere after the search_token
         possible_ans = search_res.strip().replace('"', '').lower()
         print(f"Possible parsed response: {possible_ans}")
