@@ -5,6 +5,7 @@ and splitting into train/validation/test.
 import random
 import os
 import re
+import math
 from typing import Any, List, TypedDict, Optional, Tuple, Union
 from sklearn.model_selection import train_test_split
 
@@ -68,9 +69,12 @@ class DatasetLoader:
         if num_examples > 0.5 * len(self._loaded_train_data):
             raise ValueError("num_examples cannot be more than half the training set.")
         examples = self._loaded_train_data[:num_examples]
-        train_data, validation_data = train_test_split(self._loaded_train_data[num_examples:],
-                                                       test_size=self._validation if self._validation > 0 else None,
-                                                       train_size=self._train)
+        if math.isclose(self._validation, 0.0):
+            train_data = self._loaded_train_data[num_examples:]
+        else:
+            train_data, validation_data = train_test_split(self._loaded_train_data[num_examples:],
+                                                           test_size=self._validation,
+                                                           train_size=self._train)
         return {
                 "examples": examples,
                 "train": train_data,
@@ -118,10 +122,13 @@ class DatasetLoader:
         if len(jsonlists) == 1:
             # split single file into train/test
             data = self._deserialize_helper(jsonlists[0], use_propositions)
-            train_data, test_data = train_test_split(data,
-                                                     test_size=self._test if self._test > 0 else None,
-                                                     train_size=self._train + self._validation,
-                                                     random_state=self._seed)
+            if math.isclose(self._test, 0.0):
+                train_data = data
+            else:
+                train_data, test_data = train_test_split(data,
+                                                         test_size=self._test,
+                                                         train_size=self._train + self._validation,
+                                                         random_state=self._seed)
         else:
             # first file containing 'train' is training list
             # first file containing 'test' is test list
