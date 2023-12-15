@@ -69,6 +69,7 @@ class DatasetLoader:
         if num_examples > 0.5 * len(self._loaded_train_data):
             raise ValueError("num_examples cannot be more than half the training set.")
         examples = self._loaded_train_data[:num_examples]
+        validation_data = None
         if math.isclose(self._validation, 0.0):
             train_data = self._loaded_train_data[num_examples:]
         else:
