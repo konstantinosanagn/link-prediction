@@ -57,27 +57,28 @@ def run_experiment(
         user_prompts = [user_prompt_format.format(sample.text,
                                                   response_parser.answer_format.format(response_parser.answer_token))
                         for sample in split]
-        print(f"Input prompts: {user_prompts}")
         examples = [Example(
             user_prompt=user_prompt_format.format(example.text, response_parser.answer_format.format(response_parser.answer_token)),
             assistant_response=response_parser.answer_format.format(example.type))
                     for example in data['examples']]
-        print(f"Examples: {examples}")
         expected_results = [sample.type for sample in split]
-        print(f"Expected results: {expected_results}")
         dialogs: List[Dialog] = get_dialogs(system_prompt, user_prompts, examples, True)
         results = []
         # Have to submit prompts in batches
         for i in range(0, len(dialogs), max_batch_size):
             dialogs_batch = dialogs[i:i+max_batch_size] if i+max_batch_size < len(dialogs) else dialogs[i:]
+            print(f"Dialogs: {dialogs_batch}")
             batch_results = generator.chat_completion(
                 dialogs_batch,  # type: ignore
                 max_gen_len=max_gen_len,
                 temperature=temperature,
                 top_p=top_p
             )
-            results += [response_parser.get_parsed_response(result['generation']['content']) for result in batch_results]
-        print(f"Results: {results}")
+            print(f"Generated results: {[result['generation']['content'] for result in batch_results]}")
+            parsed_results = [response_parser.get_parsed_response(result['generation']['content']) for result in batch_results]
+            print(f"Parsed results: {parsed_results}")
+            results += parsed_results
+        print("=================================================================")
 
         # Save results
         # TODO: Record the success rate of each proposition type
