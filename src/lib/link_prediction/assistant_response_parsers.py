@@ -68,7 +68,7 @@ class PropositionResponseParser(BaseResponseParser):
         else:
             return ""
         # Llama's answer will be somewhere after the search_token
-        possible_ans = search_res.strip().replace('"', '').lower()
+        possible_ans = search_res.strip().lower()
         print(f"Possible parsed response: {possible_ans}")
         # BUG: Should throw?
         return possible_ans if possible_ans in proposition_types else ""

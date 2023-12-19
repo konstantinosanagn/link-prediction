@@ -61,7 +61,7 @@ def run_experiment(
             user_prompt=user_prompt_format.format(example.text, response_parser.answer_format.format(response_parser.answer_token)),
             assistant_response=response_parser.answer_format.format(example.type))
                     for example in data['examples']]
-        expected_results = [sample.type for sample in split]
+        expected_results = [sample.type.lower() for sample in split]
         dialogs: List[Dialog] = get_dialogs(system_prompt, user_prompts, examples, True)
         results = []
         # Have to submit prompts in batches
@@ -69,7 +69,7 @@ def run_experiment(
             dialogs_batch = dialogs[i:i+max_batch_size] if i+max_batch_size < len(dialogs) else dialogs[i:]
             print(f"Dialogs: {dialogs_batch}")
             batch_results = generator.chat_completion(
-                dialogs_batch,  # type: ignore
+                dialogs_batch,
                 max_gen_len=max_gen_len,
                 temperature=temperature,
                 top_p=top_p

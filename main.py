@@ -44,6 +44,9 @@ def main(
     for experiment_cfg in cfg['experiments']:
         print(f"Running Experiment {experiment_cfg['name']}")
         data = data_loader.get_splits(experiment_cfg['num_examples'])
+        print("Data: ============================")
+        print(data)
+        print("==========================")
         try:
             run_experiment(
                     generator,
