@@ -30,9 +30,9 @@ class DatasetLoader:
         dataset_path: str,
         use_propositions: bool,
         seed: int,
-        train: Optional[float] = None,
-        validation: Optional[float] = None,
-        test: Optional[float] = None
+        train: float = 0.7,
+        validation: float = 0.2,
+        test: float = 0.1
     ) -> None:
         """
         Args:
@@ -61,10 +61,11 @@ class DatasetLoader:
         num_examples: int
     ) -> SplitData:
         """
+        Retrieves the examples, train, validation, and test splits of the loaded dataset.
         Args:
-
+            num_examples (int): Number of examples to include in the split data.
         Returns:
-
+            SplitData: Dataset split into examples, train, validation, test
         """
         if num_examples > 0.5 * len(self._loaded_train_data):
             raise ValueError("num_examples cannot be more than half the training set.")
@@ -74,7 +75,6 @@ class DatasetLoader:
             train_data = self._loaded_train_data[num_examples:]
         else:
             train_data, validation_data = train_test_split(self._loaded_train_data[num_examples:],
-                                                           test_size=self._validation,
                                                            train_size=self._train)
         return {
                 "examples": examples,
@@ -141,3 +141,13 @@ class DatasetLoader:
                 if train_data and test_data:
                     break
         return train_data, test_data
+
+def _test(path_to_dataset_dir):
+    dataset_loader = DatasetLoader(path_to_dataset_dir, True, 1)
+    data = dataset_loader.get_splits(0)
+    print(data)
+
+if __name__ == '__main__':
+    import fire
+    # Some test
+    fire.Fire(_test)
