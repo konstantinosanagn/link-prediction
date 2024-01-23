@@ -1,3 +1,7 @@
+fire
+pandas
+pylint
+scikit-learn
 torch
 torchvision
 torchaudio
