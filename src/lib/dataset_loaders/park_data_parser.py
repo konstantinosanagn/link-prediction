@@ -3,8 +3,12 @@ Dataclasses and JSON deserialization for review dataset.
 """
 
 import json
+import os
+import random
 from typing import List
 from dataclasses import dataclass
+
+from src.lib.dataset_loaders.amazon_review_dataset_loader import SplitData
 
 @dataclass
 class Proposition:
@@ -50,6 +54,14 @@ def deserialize_comments_jsonlist(filepath: str)\
         for line in f:
             comments.append(deserialize(json.loads(line)))
     return comments
+
+def serialize_comments_jsonlists(directory_path: str, comments: List[Comment], train: float, validation: float, test: float):
+    """
+    Serializes comments to traini, validation, and test under directory_path.
+    """
+    shuffled_comments = random.sample(comments, len(comments))
+    with open(split_filepath, 'w', encoding='utf-8') as f:
+
 
 if __name__ == '__main__':
     import sys

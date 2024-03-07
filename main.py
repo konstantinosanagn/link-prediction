@@ -28,12 +28,11 @@ def main(
         # TODO: Validate config against schema
         cfg = json.load(f)
     data_loader = globals()[cfg['dataset_loader']](
-            cfg['dataset_dir_path'],
+            cfg['train_path'],
+            cfg['validation_path'],
+            cfg['test_path'],
             cfg['use_propositions'],
             cfg['seed'],
-            cfg['train'],
-            cfg['validation'],
-            cfg['test']
         )
     response_parser: BaseResponseParser = globals()[cfg['response_parser']]()
     generator = Llama.build(
