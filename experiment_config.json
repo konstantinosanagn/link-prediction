@@ -1,12 +1,12 @@
 {
   "seed": 1,
-  "dataset_dir_path": "/home/parklab/data/cdcp_type_edge_annot",
+  "dataset_dir_path": "/home/parklab/data/debugging_dataset",
   "dataset_loader": "DatasetLoader",
   "response_parser": "PropositionResponseParser",
   "use_propositions": true,
-  "train": 0.7,
-  "validation": 0.2,
-  "test": 0.1,
+  "train": 1.0,
+  "validation": 0.0,
+  "test": 0.0,
   "experiments":
   [
     {

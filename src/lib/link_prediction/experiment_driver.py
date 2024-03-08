@@ -12,6 +12,8 @@ from src.lib.dataset_loaders import SplitData
 from .dialog_formatters import get_dialogs, Example
 from .assistant_response_parsers import BaseResponseParser
 
+from sklearn.metrics import precision_score, recall_score, f1_score
+
 def run_experiment(
     generator: Llama,
     response_parser: BaseResponseParser,
@@ -80,9 +82,16 @@ def run_experiment(
             results += parsed_results
         print("=================================================================")
 
-        # Save results
-        # TODO: Record the success rate of each proposition type
-        df = pd.DataFrame(data={"Id": [t.id for t in split], "Actual": results, "Expected": expected_results})
-        df["AreEqual"] = np.where(df["Actual"] == df["Expected"], 1, 0)
-        accuracy = sum(df["AreEqual"]) / len(df["AreEqual"])
-        print(f"Accuracy: {accuracy}")
+        # After collecting all results
+        actual_types_list = expected_results  # This should already be populated with actual types
+        predicted_types_list = results  # This should be populated with the predicted types as parsed from the generator's responses
+
+        # Compute precision, recall, and F1 score
+        precision = precision_score(actual_types_list, predicted_types_list, average='weighted', labels=np.unique(predicted_types_list))
+        recall = recall_score(actual_types_list, predicted_types_list, average='weighted', labels=np.unique(predicted_types_list))
+        f1 = f1_score(actual_types_list, predicted_types_list, average='weighted', labels=np.unique(predicted_types_list))
+
+        # Print or log the performance metrics
+        print(f"Precision: {precision}")
+        print(f"Recall: {recall}")
+        print(f"F1 Score: {f1}")

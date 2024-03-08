@@ -72,3 +72,21 @@ class PropositionResponseParser(BaseResponseParser):
         print(f"Possible parsed response: {possible_ans}")
         # BUG: Should throw?
         return possible_ans if possible_ans in proposition_types else ""
+    
+        def get_parsed_response2(self, response: str) -> str:
+            """
+            Parses the assistant response by directly searching for proposition types (without using regex).
+            """
+            proposition_types = set(['fact', 'testimony', 'policy', 'value', 'reference'])
+            print(f"Parsing assistant response: {response}")
+            # Make search case-insensitive
+            response_lower = response.lower()
+
+            # Directly search for each proposition type in the response
+            for proposition_type in proposition_types:
+                if proposition_type in response_lower:
+                    print(f"Found parsed response: {proposition_type}")
+                    return proposition_type  # Return the first found proposition type
+
+            # If no proposition type is found in the response, return an empty string
+            return ""
