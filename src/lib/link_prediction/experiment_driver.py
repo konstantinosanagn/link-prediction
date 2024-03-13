@@ -68,12 +68,20 @@ def run_experiment(
         for i in range(0, len(dialogs), max_batch_size):
             dialogs_batch = dialogs[i:i+max_batch_size] if i+max_batch_size < len(dialogs) else dialogs[i:]
             print(f"Dialogs: {dialogs_batch}")
+            
+            print(len(dialogs_batch))
+            print(generator)
+            print(max_gen_len)
+            print(temperature)
+            print(top_p)
+            
             batch_results = generator.chat_completion(
                 dialogs_batch,
                 max_gen_len=max_gen_len,
                 temperature=temperature,
                 top_p=top_p
             )
+            
             print(f"Generated results: {[result['generation']['content'] for result in batch_results]}")
             parsed_results = [response_parser.get_parsed_response(result['generation']['content']) for result in batch_results]
             print(f"Parsed results: {parsed_results}")

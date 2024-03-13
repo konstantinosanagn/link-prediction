@@ -1,8 +1,8 @@
 {
   "seed": 1,
-  "train_path": "",
-  "validation_path": "",
-  "test_path": "",
+  "train_path": "/home/parklab/data/training_set.jsonlist",
+  "validation_path": "/home/parklab/data/validation_set2.jsonlist",
+  "test_path": "/home/parklab/data/test_set.jsonlist",
   "dataset_loader": "DatasetLoader",
   "response_parser": "PropositionResponseParser",
   "use_propositions": true,
