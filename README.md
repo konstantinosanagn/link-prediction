@@ -1,6 +1,8 @@
 # link-prediction
 
 # Setup
+**Clone this repo with `git clone --recurse-submodules <URI>`.
+
 ## 1. Follow instructions to download llama models
 - **NOTE: The repo is already added as a submodule, so no need to clone separately.**
 - Instructions per https://github.com/facebookresearch/llama
@@ -22,11 +24,18 @@
 
 - This will install all dependencies required by this project via `pip` (including the llama repo as an editable package).
 
+# Run
+`torchrun --nproc_per_node 2 main.py --path_to_cfg ./experiment_config.json --ckpt_dir /home/parklab/models/llama2/llama-2-13b-chat/ --tokenizer_path /home/parklab/models/llama2/tokenizer.model`
+
 # Miscellaneous
 ## llama submodule
 `git submodule add https://github.com/facebookresearch/llama`
 
 `git config -f .gitmodules submodule.llama.ignore dirty # ignore dirty commits in the submodule`
+
+If you forgot to clone with `--recurse-submodules`, you'll need to run the following command:
+
+`git submodule update --init --recursive`
 
 For now, we will use a git submodule to version control the llama editable pip package.
 
