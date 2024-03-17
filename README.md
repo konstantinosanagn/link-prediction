@@ -29,15 +29,19 @@
 
 # Miscellaneous
 ## llama submodule
+The Llama repo was added as a submodule via the following. For now, we will use a git submodule to version control the llama editable pip package.
 `git submodule add https://github.com/facebookresearch/llama`
 
 `git config -f .gitmodules submodule.llama.ignore dirty # ignore dirty commits in the submodule`
+
+`git config -f .gitmodules submodule.llama.branch main`
 
 If you forgot to clone with `--recurse-submodules`, you'll need to run the following command:
 
 `git submodule update --init --recursive`
 
-For now, we will use a git submodule to version control the llama editable pip package.
+### Updating Llama submodule
+`git submodule update --remote`
 
 ## Model directory
 The model files should be downloaded to a shared directory so the single copy can be used by multiple users. You will point the llama APIs to the model in this directory.
