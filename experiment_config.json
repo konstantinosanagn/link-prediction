@@ -1,0 +1,19 @@
+{
+  "seed": 1,
+  "dataset_dir_path": "/home/parklab/data/debugging_dataset",
+  "dataset_loader": "DatasetLoader",
+  "response_parser": "PropositionResponseParser",
+  "use_propositions": true,
+  "train": 1.0,
+  "validation": 0.0,
+  "test": 0.0,
+  "experiments":
+  [
+    {
+      "name": "ZeroShot",
+      "num_examples": 0,
+      "system_prompt": "The four types of propositions are \"fact\", \"testimony\", \"policy\", \"value\", and \"reference\". \"Fact\" is an objective proposition, meaning there are no subjective interpretations or judgements. \"Testimony\" is also an objective proposition that is experiential. \"Policy\" is a subjective proposition that insists on a specific course of action. \"Value\" is a subjective proposition that is a personal opinion or expression of feeling. \"Reference\" refers to a resource containing objective evidence. In product reviews, reference is usually a URL to another product page, image or video.",
+      "user_prompt_format": "Classify the following proposition as \"fact\", \"testimony\", \"policy\", \"value\", or \"reference\": \"{}\"\nWith no other text, answer in the desired format:\n{}"
+    }
+  ]
+}
