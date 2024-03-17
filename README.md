@@ -41,7 +41,15 @@ If you forgot to clone with `--recurse-submodules`, you'll need to run the follo
 `git submodule update --init --recursive`
 
 ### Updating Llama submodule
-`git submodule update --remote`
+https://stackoverflow.com/questions/1777854/how-can-i-specify-a-branch-tag-when-adding-a-git-submodule/18799234
+
+```
+git submodule foreach -q --recursive \
+  'git switch \
+  $(git config -f $toplevel/.gitmodules submodule.$name.branch || echo main)'
+
+git submodule update --recursive --remote
+```
 
 ## Model directory
 The model files should be downloaded to a shared directory so the single copy can be used by multiple users. You will point the llama APIs to the model in this directory.
