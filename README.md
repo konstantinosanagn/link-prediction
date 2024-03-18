@@ -1,8 +1,8 @@
 # link-prediction
-Follow these steps on the development server (not your local machine).
+**Follow these steps on the development server (not your local machine).**
 
 # Setup
-**Clone this repo with `git clone --recurse-submodules <URI>`.
+**Clone this repo with `git clone --recurse-submodules <URI>`.**
 
 ## 1. Follow instructions to download llama models
 - **NOTE: The repo is already added as a submodule, so no need to clone separately.**
