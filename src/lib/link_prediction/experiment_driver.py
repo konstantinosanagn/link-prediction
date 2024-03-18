@@ -5,6 +5,7 @@ Module containing function to run a prompting experiment.
 from typing import List, Optional
 import pandas as pd
 import numpy as np
+from sklearn.metrics import precision_score, recall_score, f1_score
 
 from llama import Llama, Dialog
 
@@ -68,12 +69,20 @@ def run_experiment(
         for i in range(0, len(dialogs), max_batch_size):
             dialogs_batch = dialogs[i:i+max_batch_size] if i+max_batch_size < len(dialogs) else dialogs[i:]
             print(f"Dialogs: {dialogs_batch}")
+            
+            print(len(dialogs_batch))
+            print(generator)
+            print(max_gen_len)
+            print(temperature)
+            print(top_p)
+            
             batch_results = generator.chat_completion(
                 dialogs_batch,
                 max_gen_len=max_gen_len,
                 temperature=temperature,
                 top_p=top_p
             )
+            
             print(f"Generated results: {[result['generation']['content'] for result in batch_results]}")
             parsed_results = [response_parser.get_parsed_response(result['generation']['content']) for result in batch_results]
             print(f"Parsed results: {parsed_results}")
@@ -83,6 +92,13 @@ def run_experiment(
         # Save results
         # TODO: Record the success rate of each proposition type
         df = pd.DataFrame(data={"Id": [t.id for t in split], "Actual": results, "Expected": expected_results})
-        df["AreEqual"] = np.where(df["Actual"] == df["Expected"], 1, 0)
-        accuracy = sum(df["AreEqual"]) / len(df["AreEqual"])
-        print(f"Accuracy: {accuracy}")
+        
+        # Calculate precision, recall, and F1 scores
+        precision = precision_score(df["Expected"], df["Actual"], average='weighted')
+        recall = recall_score(df["Expected"], df["Actual"], average='weighted')
+        f1 = f1_score(df["Expected"], df["Actual"], average='weighted')
+
+        # Print results
+        print(f'Precision: {precision:.4f}')
+        print(f'Recall: {recall:.4f}')
+        print(f'F1 Score: {f1:.4f}')
