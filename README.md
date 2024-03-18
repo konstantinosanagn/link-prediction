@@ -1,4 +1,5 @@
 # link-prediction
+Follow these steps on the development server (not your local machine).
 
 # Setup
 **Clone this repo with `git clone --recurse-submodules <URI>`.
