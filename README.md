@@ -1,7 +1,8 @@
 # link-prediction
+**Follow these steps on the development server (not your local machine).**
 
 # Setup
-**Clone this repo with `git clone --recurse-submodules <URI>`.
+**Clone this repo with `git clone --recurse-submodules <URI>`.**
 
 ## 1. Follow instructions to download llama models
 - **NOTE: The repo is already added as a submodule, so no need to clone separately.**
@@ -29,15 +30,27 @@
 
 # Miscellaneous
 ## llama submodule
+The Llama repo was added as a submodule via the following. For now, we will use a git submodule to version control the llama editable pip package.
 `git submodule add https://github.com/facebookresearch/llama`
 
 `git config -f .gitmodules submodule.llama.ignore dirty # ignore dirty commits in the submodule`
+
+`git config -f .gitmodules submodule.llama.branch main`
 
 If you forgot to clone with `--recurse-submodules`, you'll need to run the following command:
 
 `git submodule update --init --recursive`
 
-For now, we will use a git submodule to version control the llama editable pip package.
+### Updating Llama submodule
+https://stackoverflow.com/questions/1777854/how-can-i-specify-a-branch-tag-when-adding-a-git-submodule/18799234
+
+```
+git submodule foreach -q --recursive \
+  'git switch \
+  $(git config -f $toplevel/.gitmodules submodule.$name.branch || echo main)'
+
+git submodule update --recursive --remote
+```
 
 ## Model directory
 The model files should be downloaded to a shared directory so the single copy can be used by multiple users. You will point the llama APIs to the model in this directory.
