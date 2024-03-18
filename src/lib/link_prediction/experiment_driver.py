@@ -5,6 +5,7 @@ Module containing function to run a prompting experiment.
 from typing import List, Optional
 import pandas as pd
 import numpy as np
+from sklearn.metrics import precision_score, recall_score, f1_score
 
 from llama import Llama, Dialog
 
@@ -70,28 +71,29 @@ def run_experiment(
         for i in range(0, len(dialogs), max_batch_size):
             dialogs_batch = dialogs[i:i+max_batch_size] if i+max_batch_size < len(dialogs) else dialogs[i:]
             print(f"Dialogs: {dialogs_batch}")
+            
+            print(len(dialogs_batch))
+            print(generator)
+            print(max_gen_len)
+            print(temperature)
+            print(top_p)
+            
             batch_results = generator.chat_completion(
                 dialogs_batch,
                 max_gen_len=max_gen_len,
                 temperature=temperature,
                 top_p=top_p
             )
+            
             print(f"Generated results: {[result['generation']['content'] for result in batch_results]}")
             parsed_results = [response_parser.get_parsed_response(result['generation']['content']) for result in batch_results]
             print(f"Parsed results: {parsed_results}")
             results += parsed_results
         print("=================================================================")
 
-        # After collecting all results
-        actual_types_list = expected_results  # This should already be populated with actual types
-        predicted_types_list = results  # This should be populated with the predicted types as parsed from the generator's responses
-
-        # Compute precision, recall, and F1 score
-        precision = precision_score(actual_types_list, predicted_types_list, average='weighted', labels=np.unique(predicted_types_list))
-        recall = recall_score(actual_types_list, predicted_types_list, average='weighted', labels=np.unique(predicted_types_list))
-        f1 = f1_score(actual_types_list, predicted_types_list, average='weighted', labels=np.unique(predicted_types_list))
-
-        # Print or log the performance metrics
-        print(f"Precision: {precision}")
-        print(f"Recall: {recall}")
-        print(f"F1 Score: {f1}")
+        # Save results
+        # TODO: Record the success rate of each proposition type
+        df = pd.DataFrame(data={"Id": [t.id for t in split], "Actual": results, "Expected": expected_results})
+        df["AreEqual"] = np.where(df["Actual"] == df["Expected"], 1, 0)
+        accuracy = sum(df["AreEqual"]) / len(df["AreEqual"])
+        print(f"Accuracy: {accuracy}")

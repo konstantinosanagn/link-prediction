@@ -19,7 +19,7 @@ def main(
     run_on_validation = False,
     run_on_test = False,
     max_batch_size: int = 8,
-    max_seq_len: int = 128,
+    max_seq_len: int = 512,
     max_gen_len: Optional[int] = None
 ):
     # Parse config, run experiments.
@@ -28,12 +28,11 @@ def main(
         # TODO: Validate config against schema
         cfg = json.load(f)
     data_loader = globals()[cfg['dataset_loader']](
-            cfg['dataset_dir_path'],
+            cfg['train_path'],
+            cfg['validation_path'],
+            cfg['test_path'],
             cfg['use_propositions'],
             cfg['seed'],
-            cfg['train'],
-            cfg['validation'],
-            cfg['test']
         )
     response_parser: BaseResponseParser = globals()[cfg['response_parser']]()
     generator = Llama.build(
@@ -45,7 +44,7 @@ def main(
         print(f"Running Experiment {experiment_cfg['name']}")
         data = data_loader.get_splits(experiment_cfg['num_examples'])
         print("Data: ============================")
-        print(data)
+        # print(data)
         print("==========================")
         try:
             run_experiment(
