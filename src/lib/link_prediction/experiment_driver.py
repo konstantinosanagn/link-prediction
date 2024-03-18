@@ -5,6 +5,7 @@ Module containing function to run a prompting experiment.
 from typing import List, Optional
 import pandas as pd
 import numpy as np
+from sklearn.metrics import precision_score, recall_score, f1_score
 
 from llama import Llama, Dialog
 
@@ -91,6 +92,13 @@ def run_experiment(
         # Save results
         # TODO: Record the success rate of each proposition type
         df = pd.DataFrame(data={"Id": [t.id for t in split], "Actual": results, "Expected": expected_results})
-        df["AreEqual"] = np.where(df["Actual"] == df["Expected"], 1, 0)
-        accuracy = sum(df["AreEqual"]) / len(df["AreEqual"])
-        print(f"Accuracy: {accuracy}")
+        
+        # Calculate precision, recall, and F1 scores
+        precision = precision_score(df["Expected"], df["Actual"], average='weighted')
+        recall = recall_score(df["Expected"], df["Actual"], average='weighted')
+        f1 = f1_score(df["Expected"], df["Actual"], average='weighted')
+
+        # Print results
+        print(f'Precision: {precision:.4f}')
+        print(f'Recall: {recall:.4f}')
+        print(f'F1 Score: {f1:.4f}')
