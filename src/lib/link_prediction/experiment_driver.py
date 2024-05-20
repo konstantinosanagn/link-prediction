@@ -1,6 +1,7 @@
 """
-Module containing function to run a prompting experiment.
+Module to run prompting experiments using the LLAMA model, evaluate responses, and calculate performance metrics.
 """
+
 
 from typing import List, Optional
 import pandas as pd
@@ -48,6 +49,8 @@ def run_experiment(
             Defaults to False.
     """
     # TODO: Validate args?
+    
+    # Determine which data splits to use based on flags
     splits_to_use = [data['train']]
     if run_on_validation and data['validation']:
         splits_to_use.append(data['validation'])
@@ -55,9 +58,13 @@ def run_experiment(
         splits_to_use.append(data['test'])
     for split in splits_to_use:
         # TODO: Log to see the token input to the model.
+        
+        # Generate user prompts for the split
         user_prompts = [user_prompt_format.format(sample.text,
                                                   response_parser.answer_format.format(response_parser.answer_token))
                         for sample in split]
+        
+        # Create dialog instances for the prompts
         examples = [Example(
             user_prompt=user_prompt_format.format(example.text, response_parser.answer_format.format(response_parser.answer_token)),
             assistant_response=response_parser.answer_format.format(example.type))
@@ -65,7 +72,7 @@ def run_experiment(
         expected_results = [sample.type.lower() for sample in split]
         dialogs: List[Dialog] = get_dialogs(system_prompt, user_prompts, examples, True)
         results = []
-        # Have to submit prompts in batches
+        # Execute experiments in batches due to potential memory constraints
         for i in range(0, len(dialogs), max_batch_size):
             dialogs_batch = dialogs[i:i+max_batch_size] if i+max_batch_size < len(dialogs) else dialogs[i:]
             print(f"Dialogs: {dialogs_batch}")
@@ -102,3 +109,5 @@ def run_experiment(
         print(f'Precision: {precision:.4f}')
         print(f'Recall: {recall:.4f}')
         print(f'F1 Score: {f1:.4f}')
+        
+        # TODO: Consider exporting results to external files or databases for further analysis

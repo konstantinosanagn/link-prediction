@@ -1,0 +1,55 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "ExperimentConfig",
+  "type": "object",
+  "properties": {
+    "seed": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "train_path": {
+      "type": "string",
+      "format": "uri-reference"
+    },
+    "validation_path": {
+      "type": "string",
+      "format": "uri-reference"
+    },
+    "test_path": {
+      "type": "string",
+      "format": "uri-reference"
+    },
+    "dataset_loader": {
+      "type": "string"
+    },
+    "response_parser": {
+      "type": "string"
+    },
+    "use_propositions": {
+      "type": "boolean"
+    },
+    "experiments": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "num_examples": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "system_prompt": {
+            "type": "string"
+          },
+          "user_prompt_format": {
+            "type": "string"
+          }
+        },
+        "required": ["name", "num_examples", "system_prompt", "user_prompt_format"]
+      }
+    }
+  },
+  "required": ["seed", "train_path", "validation_path", "test_path", "dataset_loader", "response_parser", "use_propositions", "experiments"]
+}
