@@ -3,15 +3,27 @@
   "train_path": "/home/parklab/data/debugging_dataset/debugging.jsonlist",
   "validation_path": "/home/parklab/data/validation_set2.jsonlist",
   "test_path": "/home/parklab/data/test_set.jsonlist",
-  "dataset_loader": "EnhancedDatasetLoader",
+  "dataset_loader": "DatasetLoader",
   "response_parser": "SupportResponseParser",
-  "use_propositions": true,
+  "use_propositions": false,
   "experiments": [
     {
       "name": "ContextualSupport",
       "num_examples": 0,
-      "system_prompt": "Given a proposition and its surrounding propositions, determine if the surrounding propositions support the given proposition. Answer with 'yes' or 'no' for each surrounding proposition.",
-      "user_prompt_format": "Proposition: \"{}\"\nSurrounding Propositions: {}\nDo the surrounding propositions support the proposition? Answer with 'yes' or 'no' for each:\n{}"
+      "system_prompt": "Given a proposition and its surrounding proposition, determine if the surrounding proposition supports the given proposition. Answer with 'yes' or 'no'.",
+      "user_prompt_format": "Proposition: \"{}\"\nSurrounding Proposition: {}\nDoes the surrounding proposition support the proposition? With no other text, answer either 'yes' or 'no':\n{}"
+    }, 
+    {
+      "name": "ContextualSupport",
+      "num_examples": 0,
+      "system_prompt": "Given two propositions, determine if the second proposition supports the first proposition. Answer with 'yes' or 'no'.",
+      "user_prompt_format": "First Proposition: \"{}\"\nSecond Proposition: {}\nDoes the second proposition support the first proposition? Answer either 'yes' or 'no':\n{}"
+    }, 
+    {
+      "name": "ContextualSupport",
+      "num_examples": 0,
+      "system_prompt": "You are asked to perform a relation detection task.",
+      "user_prompt_format": "First Proposition: \"{}\"\nSecond Proposition: {}\nDoes the second proposition support the first proposition? Answer either 'yes' or 'no':\n{}"
     }
   ]
 }

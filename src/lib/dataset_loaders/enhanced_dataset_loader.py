@@ -39,8 +39,8 @@ class EnhancedDatasetLoader(DatasetLoader):
             new_index = index + offset
             if 0 <= new_index < len(propositions):
                 surrounding.append(propositions[new_index].text)
-            else:
-                surrounding.append(None)
+            # else:
+            #     surrounding.append(None)
         return surrounding
 
     def load_data_with_context(

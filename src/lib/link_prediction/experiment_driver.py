@@ -56,26 +56,37 @@ def run_experiment(
         splits_to_use.append(data['validation'])
     if run_on_test and data['test']:
         splits_to_use.append(data['test'])
+        
+    # Returns a list of Comments when use_propositions: false in config, otherwise a list of Propositions in a given dataset that consists of Comments
     for split in splits_to_use:
+       
         # TODO: Log to see the token input to the model.
         
         # Generate user prompts for the split
         user_prompts = [user_prompt_format.format(sample.text,
                                                   response_parser.answer_format.format(response_parser.answer_token))
-                        for sample in split]
+                        for sample in split] 
+        # print('===================================USER_PROMPTS===========================================')
+        # print(user_prompts)
+        # print('===================================END_USER_PROMPTS===========================================')
         
         # Create dialog instances for the prompts
         examples = [Example(
             user_prompt=user_prompt_format.format(example.text, response_parser.answer_format.format(response_parser.answer_token)),
             assistant_response=response_parser.answer_format.format(example.type))
                     for example in data['examples']]
+        
         expected_results = [sample.type.lower() for sample in split]
+        
         dialogs: List[Dialog] = get_dialogs(system_prompt, user_prompts, examples, True)
         results = []
         # Execute experiments in batches due to potential memory constraints
         for i in range(0, len(dialogs), max_batch_size):
             dialogs_batch = dialogs[i:i+max_batch_size] if i+max_batch_size < len(dialogs) else dialogs[i:]
-            print(f"Dialogs: {dialogs_batch}")
+            print('===========================DIALOGS_BATCH==============================')
+            print(f"Dialogs batch: {dialogs_batch}")  # Inspect the batch content
+            print('===========================END_DIALOGS_BATCH==============================')
+            
             
             print(len(dialogs_batch))
             print(generator)
@@ -90,10 +101,10 @@ def run_experiment(
                 top_p=top_p
             )
             
-            print(f"Generated results: {[result['generation']['content'] for result in batch_results]}")
-            parsed_results = [response_parser.get_parsed_response(result['generation']['content']) for result in batch_results]
-            print(f"Parsed results: {parsed_results}")
-            results += parsed_results
+            # print(f"Generated results: {[result['generation']['content'] for result in batch_results]}")
+            # parsed_results = [response_parser.get_parsed_response(result['generation']['content']) for result in batch_results]
+            # print(f"Parsed results: {parsed_results}")
+            # results += parsed_results
         print("=================================================================")
 
         # Save results
