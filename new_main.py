@@ -5,11 +5,13 @@ import json
 from typing import Optional
 import fire                         # Library for building command line interfaces.
 from llama.generation import Llama  # Importing Llama model from the llama package
+import traceback
 
 # Imports for experiment setup and data handling
-from src.lib.link_prediction.experiment_driver import run_experiment
+from src.lib.link_prediction.new_experiment_driver import run_experiment
 from src.lib.dataset_loaders import *
 from src.lib.link_prediction.assistant_response_parsers import *
+from src.lib.link_prediction.contextual_assistant_response_parser import *
 
 def main(
     path_to_cfg: str,                   # Path to the JSON config file
@@ -39,7 +41,7 @@ def main(
         )
     
     # Load response parser class based on config
-    response_parser: BaseResponseParser = globals()[cfg['response_parser']]()
+    response_parser: SupportResponseParser = globals()[cfg['response_parser']]()
     
     # Build LLAMA generator
     generator = Llama.build(
@@ -53,7 +55,7 @@ def main(
         print(f"Running Experiment {experiment_cfg['name']}")
         data = data_loader.get_splits(experiment_cfg['num_examples'])
         print("Data: ============================")
-        # print(data)
+        print(data)
         print("==========================")
         try:
             run_experiment(
@@ -70,6 +72,7 @@ def main(
                     run_on_test)
         except Exception as e:
             print(e)
+            traceback.print_exc()
 
 if __name__ == '__main__':
     fire.Fire(main)
